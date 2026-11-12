@@ -1,0 +1,43 @@
+name: Gerar video 2D automaticamente
+
+on:
+  schedule:
+    # America/Sao_Paulo (UTC-3): 09:07, 15:07, 21:07
+    - cron: '7 0,12,18 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: fabrica-terror-2d
+  cancel-in-progress: false
+
+jobs:
+  gerar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Baixar o projeto
+        uses: actions/checkout@v4
+      - name: Preparar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Instalar FFmpeg, sintetizador de voz e Pillow
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg espeak-ng python3-pil
+          python3 -c 'from PIL import Image; print("Pillow OK")'
+      - name: Gerar video de 60 segundos
+        run: npm run generate
+      - name: Salvar MP4 nos artefatos do GitHub
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: terror-2d-${{ github.run_id }}
+          path: |
+            output/**/*.mp4
+            output/**/manifest.json
+          retention-days: 7
+          if-no-files-found: error

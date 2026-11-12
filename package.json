@@ -1,0 +1,5 @@
+{
+  "name":"fabrica-terror-2d", "version":"0.1.0", "private":true, "type":"module",
+  "scripts":{"generate":"node src/generate.mjs", "batch":"node src/generate.mjs --count=3", "doctor":"node src/generate.mjs --doctor"},
+  "engines":{"node":">=20"}
+}
